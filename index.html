@@ -1309,55 +1309,51 @@ function openMap(){document.getElementById('mpopBg').classList.add('on');documen
 function closeMap(){document.getElementById('mpopBg').classList.remove('on');document.body.style.overflow='';}
 function bgClick(e){if(e.target===document.getElementById('mpopBg'))closeMap();}
 
-// ── MUSIC PLAYER ──
-// Dùng playlist lofi từ YouTube (embed iframe ẩn)
-var LOFI_TRACKS = [
-  {id:'jfKfPfyJRdk', title:'Lofi Hip Hop Radio'},
-  {id:'5qap5aO4i9A', title:'Chill Lofi Study'},
-  {id:'DWcJFNfaw9c', title:'Lofi Chill Beats'},
-];
-var trackIdx = 0;
-var yfPlayer = null;
+// ── MUSIC PLAYER — SoundCloud Widget API ──
+var SC_URL = 'https://soundcloud.com/chillhopmusic/sets/chillhop-essentials-winter-2';
+var scWidget = null;
 var isPlaying = false;
 var autoStarted = false;
+var scReady = false;
 
-function initYT(){
-  if(window.YT && window.YT.Player) { createYTPlayer(); return; }
-  var tag = document.createElement('script');
-  tag.src = 'https://www.youtube.com/iframe_api';
-  document.head.appendChild(tag);
-}
+function initSC(){
+  if(scWidget) return;
+  // iframe SoundCloud ẩn
+  var frame = document.createElement('iframe');
+  frame.id = 'sc-frame';
+  frame.allow = 'autoplay';
+  frame.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none';
+  frame.src = 'https://w.soundcloud.com/player/?url='
+    + encodeURIComponent(SC_URL)
+    + '&auto_play=true&buying=false&liking=false&download=false'
+    + '&sharing=false&show_artwork=false&show_comments=false'
+    + '&show_playcount=false&show_user=false&hide_related=true'
+    + '&visual=false&start_track=0&continuous_play=true';
+  document.body.appendChild(frame);
 
-function onYouTubeIframeAPIReady(){
-  createYTPlayer();
-}
-window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
-
-function createYTPlayer(){
-  var div = document.createElement('div');
-  div.id = 'yt-hidden';
-  div.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;top:-9999px';
-  document.body.appendChild(div);
-  yfPlayer = new YT.Player('yt-hidden', {
-    height:'1', width:'1',
-    videoId: LOFI_TRACKS[trackIdx].id,
-    playerVars:{autoplay:1, loop:1, controls:0, mute:0},
-    events:{
-      onReady: function(e){
-        e.target.setVolume(35);
-        e.target.playVideo();
-        setPlaying(true);
-        document.getElementById('musicTitle').textContent = LOFI_TRACKS[trackIdx].title;
-      },
-      onStateChange: function(e){
-        if(e.data === YT.PlayerState.ENDED){
-          trackIdx = (trackIdx+1) % LOFI_TRACKS.length;
-          yfPlayer.loadVideoById(LOFI_TRACKS[trackIdx].id);
-          document.getElementById('musicTitle').textContent = LOFI_TRACKS[trackIdx].title;
+  // Load SC Widget API script
+  var s = document.createElement('script');
+  s.src = 'https://w.soundcloud.com/player/api.js';
+  s.onload = function(){
+    scWidget = SC.Widget(document.getElementById('sc-frame'));
+    scWidget.bind(SC.Widget.Events.READY, function(){
+      scReady = true;
+      scWidget.setVolume(38);
+      scWidget.play();
+    });
+    scWidget.bind(SC.Widget.Events.PLAY, function(){
+      setPlaying(true);
+      scWidget.getCurrentSound(function(sound){
+        if(sound && sound.title){
+          var el = document.getElementById('musicTitle');
+          if(el) el.textContent = sound.title;
         }
-      }
-    }
-  });
+      });
+    });
+    scWidget.bind(SC.Widget.Events.PAUSE,  function(){ setPlaying(false); });
+    scWidget.bind(SC.Widget.Events.FINISH, function(){ scWidget.next(); });
+  };
+  document.head.appendChild(s);
 }
 
 function setPlaying(state){
@@ -1365,52 +1361,50 @@ function setPlaying(state){
   var vinyl = document.getElementById('musicVinyl');
   var bars  = document.getElementById('musicBars');
   var btn   = document.getElementById('musicToggleBtn');
+  if(!vinyl) return;
   if(state){
     vinyl.classList.add('playing');
     bars.classList.add('playing-anim');
-    btn.textContent = '⏸';
+    if(btn) btn.textContent = '⏸';
   } else {
     vinyl.classList.remove('playing');
     bars.classList.remove('playing-anim');
-    btn.textContent = '▶';
+    if(btn) btn.textContent = '▶';
   }
 }
 
 function toggleMusic(){
-  if(!yfPlayer){ initYT(); return; }
-  if(isPlaying){ yfPlayer.pauseVideo(); setPlaying(false); }
-  else { yfPlayer.playVideo(); setPlaying(true); }
+  if(!scWidget){ initSC(); return; }
+  if(!scReady) return;
+  if(isPlaying){ scWidget.pause(); }
+  else { scWidget.play(); }
 }
 
 function setVol(v){
-  if(yfPlayer) yfPlayer.setVolume(Math.round(v*100));
+  if(scWidget && scReady) scWidget.setVolume(Math.round(parseFloat(v) * 100));
 }
 
-// Collapse/expand music player on vinyl click (mobile UX)
+// Mobile: vinyl click = expand rồi mới toggle
 document.getElementById('musicVinyl').addEventListener('click', function(e){
-  // on mobile: first click expand, second toggles play
   var mp = document.getElementById('musicPlayer');
   if(mp.classList.contains('collapsed')){
     mp.classList.remove('collapsed');
     e.stopPropagation();
     return;
   }
+  toggleMusic();
 });
 
-// Auto-start on first user interaction (bypass autoplay policy)
+// Tự phát khi có tương tác đầu tiên
 function tryAutoStart(){
   if(autoStarted) return;
   autoStarted = true;
-  initYT();
-  document.removeEventListener('touchstart', tryAutoStart);
-  document.removeEventListener('click', tryAutoStart);
-  document.removeEventListener('scroll', tryAutoStart);
+  initSC();
 }
 document.addEventListener('touchstart', tryAutoStart, {once:true});
-document.addEventListener('click', tryAutoStart, {once:true});
-document.addEventListener('scroll', tryAutoStart, {once:true});
-// Desktop: try immediately
-setTimeout(function(){ if(!autoStarted){ autoStarted=true; initYT(); } }, 800);
+document.addEventListener('click',      tryAutoStart, {once:true});
+document.addEventListener('scroll',     tryAutoStart, {once:true, passive:true});
+setTimeout(function(){ if(!autoStarted){ autoStarted=true; initSC(); } }, 1500);
 
 // ── MOBILE NAV ACTIVE STATE ──
 var sections = ['hero','bs','mn','kg','ct'];
