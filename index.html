@@ -655,7 +655,6 @@ section{padding:100px 80px}
 
 /* ── MENU ── */
 #mn{background:var(--off)}
-/* filter bar replaced by mn-filter-header above */
 .mcat{margin-bottom:56px}
 .mcat-hd{
   display:flex;align-items:center;gap:14px;
@@ -1165,7 +1164,6 @@ footer{
   </div>
   <div class="hero-r">
     <div class="hero-slideshow" id="heroSlideshow">
-      <!-- slides injected by JS -->
       <div class="slide"><div class="hero-img-ph">CAFINA</div></div>
     </div>
     <div class="slide-dots" id="slideDots"></div>
@@ -1320,9 +1318,9 @@ footer{
 
 <!-- MUSIC PLAYER -->
 <div class="music-player" id="musicPlayer">
-  <div class="music-vinyl" id="musicVinyl" onclick="toggleMusic()"></div>
+  <div class="music-vinyl" id="musicVinyl"></div>
   <div class="music-info" id="musicInfo">
-    <div class="music-title" id="musicTitle">Chill Lofi — Cafina</div>
+    <div class="music-title" id="musicTitle">Lofi — Cafina</div>
     <div class="music-bars" id="musicBars">
       <div class="music-bar"></div>
       <div class="music-bar"></div>
@@ -1449,14 +1447,11 @@ function buildDots(){
 
 function goSlide(idx){
   slideCur = (idx + slideImgs.length) % slideImgs.length;
-  // CSS animation handles vertical scroll via translateY
-  // We override with manual control
   var track = document.getElementById('slideTrack');
   if(!track) return;
   track.style.animation = 'none';
   track.style.transform = 'translateY(-' + (slideCur * 100) + 'vh)';
   track.style.transition = 'transform 0.9s cubic-bezier(.77,0,.18,1)';
-  // Update dots
   document.querySelectorAll('.slide-dot').forEach(function(d,i){
     d.classList.toggle('on', i===slideCur);
   });
@@ -1464,7 +1459,6 @@ function goSlide(idx){
 
 function startSlide(){
   if(slideImgs.length < 2) return;
-  // Use manual interval instead of CSS animation for better control
   var track = document.getElementById('slideTrack');
   if(track){
     track.style.animation = 'none';
@@ -1480,13 +1474,10 @@ function startSlide(){
 // ── MEETING CARD CALENDAR ──
 function buildMeetingCard(){
   var now = new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Ho_Chi_Minh'}));
-  var today = now.getDay(); // 0=Sun
-  var dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   var dayNamesVi = ['CN','T2','T3','T4','T5','T6','T7'];
   var container = document.getElementById('mcDays');
   if(!container) return;
   container.innerHTML = '';
-  // Show 7 days starting from Monday of current week
   var monday = new Date(now);
   var diff = now.getDay() === 0 ? -6 : 1 - now.getDay();
   monday.setDate(now.getDate() + diff);
@@ -1499,7 +1490,6 @@ function buildMeetingCard(){
     el.innerHTML = '<div class="mc-day-n">'+d.getDate()+'</div>'
       +'<div class="mc-day-l">'+dayNamesVi[d.getDay()]+'</div>';
     container.appendChild(el);
-    // dot
     var dot = document.getElementById('mcd'+i);
     if(dot && isToday) dot.classList.add('on');
   }
@@ -1601,33 +1591,11 @@ function openMap(){document.getElementById('mpopBg').classList.add('on');documen
 function closeMap(){document.getElementById('mpopBg').classList.remove('on');document.body.style.overflow='';}
 function bgClick(e){if(e.target===document.getElementById('mpopBg'))closeMap();}
 
-// ── MUSIC PLAYER — iframe SoundCloud embed ──
+// ── MUSIC PLAYER — local MP3 ──
+var audio = new Audio('lofi.mp3');
+audio.loop = true;
+audio.volume = 0.35;
 var isPlaying = false;
-var scFrame = null;
-var scInited = false;
-
-function initMusic(){
-  if(scInited) return;
-  scInited = true;
-
-  // Tạo iframe SoundCloud nhúng trực tiếp — cách đáng tin cậy nhất
-  scFrame = document.createElement('iframe');
-  scFrame.id = 'sc-frame';
-  scFrame.width = '1';
-  scFrame.height = '1';
-  scFrame.scrolling = 'no';
-  scFrame.frameBorder = 'no';
-  scFrame.allow = 'autoplay';
-  scFrame.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;pointer-events:none;width:1px;height:1px;';
-  scFrame.src = 'https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/chillhopmusic/sets/chillhop-essentials-winter-2&color=%231a3a5c&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&buying=false&liking=false&download=false&sharing=false';
-  document.body.appendChild(scFrame);
-
-  // Fake playing state sau 2s (iframe không expose event ra ngoài dễ dàng)
-  setTimeout(function(){
-    setPlaying(true);
-    document.getElementById('musicTitle').textContent = 'Chillhop Essentials';
-  }, 2000);
-}
 
 function setPlaying(state){
   isPlaying = state;
@@ -1647,42 +1615,18 @@ function setPlaying(state){
 }
 
 function toggleMusic(){
-  if(!scInited){ initMusic(); return; }
-  // Gửi postMessage tới iframe SoundCloud để play/pause
-  if(!scFrame) return;
-  var method = isPlaying ? 'pause' : 'play';
-  try {
-    scFrame.contentWindow.postMessage(
-      JSON.stringify({method: method}),
-      'https://w.soundcloud.com'
-    );
-    setPlaying(!isPlaying);
-  } catch(e){}
+  if(isPlaying){
+    audio.pause();
+    setPlaying(false);
+  } else {
+    audio.play().catch(function(){});
+    setPlaying(true);
+  }
 }
 
 function setVol(v){
-  if(!scFrame) return;
-  try {
-    scFrame.contentWindow.postMessage(
-      JSON.stringify({method:'setVolume', value: Math.round(parseFloat(v)*100)}),
-      'https://w.soundcloud.com'
-    );
-  } catch(e){}
+  audio.volume = parseFloat(v);
 }
-
-// Lắng nghe postMessage từ SoundCloud iframe
-window.addEventListener('message', function(e){
-  if(!e.origin.includes('soundcloud.com')) return;
-  try {
-    var data = JSON.parse(e.data);
-    if(data.soundCloudTrackingEvent === 'play') setPlaying(true);
-    if(data.soundCloudTrackingEvent === 'pause') setPlaying(false);
-    if(data.currentSound && data.currentSound.title){
-      var el = document.getElementById('musicTitle');
-      if(el) el.textContent = data.currentSound.title;
-    }
-  } catch(e){}
-});
 
 // Mobile: vinyl click = expand rồi toggle
 document.getElementById('musicVinyl').addEventListener('click', function(e){
@@ -1700,12 +1644,15 @@ var autoStarted = false;
 function tryAutoStart(){
   if(autoStarted) return;
   autoStarted = true;
-  initMusic();
+  audio.play().then(function(){
+    setPlaying(true);
+  }).catch(function(){
+    // Browser chặn autoplay — chờ user nhấn nút play
+  });
 }
 document.addEventListener('touchstart', tryAutoStart, {once:true});
 document.addEventListener('click',      tryAutoStart, {once:true});
 document.addEventListener('scroll',     tryAutoStart, {once:true, passive:true});
-setTimeout(function(){ tryAutoStart(); }, 2000);
 
 // ── MOBILE NAV ACTIVE STATE ──
 var sections = ['hero','bs','mn','kg','ct'];
