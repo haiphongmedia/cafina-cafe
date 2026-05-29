@@ -1511,12 +1511,12 @@ function hideLoadScreen() {
    DATA FETCH — all-at-once, render all
 ══════════════════════════════════════ */
 function load() {
-  setLoadProgress(10, 'Kết nối server...');
+  setLoadProgress(10, 'Xin chào tiểu thư ..');
 
   // Simulate incremental progress while waiting for network
   var progressTimer = setInterval(function() {
     if (loadProgress < 70) {
-      setLoadProgress(loadProgress + 4, 'Đang tải dữ liệu...');
+      setLoadProgress(loadProgress + 4, 'Vui lòng đợi trong giây lát ..');
     }
   }, 300);
 
@@ -1524,7 +1524,7 @@ function load() {
     .then(function(r) { return r.json(); })
     .then(function(d) {
       clearInterval(progressTimer);
-      setLoadProgress(80, 'Đang dựng nội dung...');
+      setLoadProgress(80, 'Rất vui được phục vụ...');
 
       ALL = d.menu || [];
       var imgs = d.anhKhongGian || [];
@@ -1536,7 +1536,7 @@ function load() {
       renderKg(imgs);
 
       dataReady = true;
-      setLoadProgress(100, 'Hoàn tất!');
+      setLoadProgress(100, 'Chào mừng!');
 
       // Preload the first hero image before dismissing loader
       if (imgs.length) {
@@ -1551,7 +1551,7 @@ function load() {
     })
     .catch(function(e) {
       clearInterval(progressTimer);
-      setLoadProgress(100, 'Không thể kết nối.');
+      setLoadProgress(100, 'Ops! Lỗi mạng mất rồi ..');
       // Still dismiss — show page with skeletons cleared
       renderBsError();
       renderMnError();
