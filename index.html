@@ -411,6 +411,7 @@ nav.up{box-shadow:0 1px 24px rgba(0,0,0,0.06)}
   transform:translateY(20px);
   transition:transform 0.3s;
   overflow:hidden;
+  box-shadow:0 24px 64px rgba(0,0,0,0.28);
 }
 .mpop-bg.on .mpop{transform:none}
 .mpop-top{
@@ -429,23 +430,46 @@ nav.up{box-shadow:0 1px 24px rgba(0,0,0,0.06)}
   transition:color 0.2s;padding:0 4px;
 }
 .mpop-x:hover{color:var(--ink)}
-.mpop-map{width:100%;height:210px;display:block;filter:grayscale(20%)}
+.mpop-map{width:100%;height:210px;display:block;filter:grayscale(15%)}
+
+/* Prominent action buttons — full-height, distinct colors */
 .mpop-btns{
-  display:flex;gap:0;border-top:1px solid var(--border);
+  display:flex;gap:0;
+  /* No top border — buttons are full-bleed below the map */
 }
 .mpop-btn{
-  flex:1;padding:14px 12px;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  font-size:11px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;
-  text-decoration:none;color:var(--ink2);background:var(--w);
-  border:none;border-right:1px solid var(--border);
-  cursor:pointer;font-family: var(--font-body);
-  transition:all 0.2s;
+  flex:1;padding:18px 12px;
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;
+  text-decoration:none;
+  border:none;cursor:pointer;
+  font-family: var(--font-body);
+  transition:all 0.18s;
+  line-height:1;
 }
-.mpop-btn:last-child{border-right:none}
-.mpop-btn:hover{background:var(--off);color:var(--blue)}
-.mpop-btn.prime{background:var(--blue);color:#fff}
+/* Google Maps — dark ink, light bg with left accent stripe */
+.mpop-btn.gmap{
+  background:var(--off);
+  color:var(--ink);
+  border-right:1px solid var(--border);
+  position:relative;
+}
+.mpop-btn.gmap::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;
+  width:3px;background:#4285F4;
+}
+.mpop-btn.gmap:hover{background:#e8edf5;color:var(--blue)}
+/* Apple / native Maps — bold blue, full fill */
+.mpop-btn.prime{
+  background:var(--blue);
+  color:#fff;
+}
 .mpop-btn.prime:hover{background:var(--blue2)}
+.mpop-btn svg{ flex-shrink:0; }
+/* Small icon badge next to button label */
+.mpop-btn-label{ display:flex;flex-direction:column;align-items:flex-start;gap:2px; }
+.mpop-btn-label-main{ font-size:12px;font-weight:600;letter-spacing:0.08em; }
+.mpop-btn-label-sub{ font-size:9px;font-weight:400;opacity:0.6;letter-spacing:0.06em;text-transform:none; }
 
 /* ─────────────────────────────────────────
    HERO
@@ -552,10 +576,11 @@ nav.up{box-shadow:0 1px 24px rgba(0,0,0,0.06)}
   position:relative;
   flex:1;
   overflow:hidden;
-  cursor:grab;
+  cursor:pointer;          /* ← pointer = tappable */
   user-select:none;
+  -webkit-user-select:none;
 }
-.hero-slideshow:active{ cursor:grabbing; }
+.hero-slideshow:active{ cursor:pointer; }
 
 /* Slide stack — translated vertically to show current */
 .slide-track{
@@ -627,19 +652,26 @@ nav.up{box-shadow:0 1px 24px rgba(0,0,0,0.06)}
   text-transform:uppercase;color:var(--ink2);
 }
 
-/* Swipe hint arrow — shown briefly */
+/* Tap / swipe hint — fades in once after load */
 .swipe-hint{
-  position:absolute;bottom:52px;right:14px;
+  position:absolute;bottom:48px;left:50%;
+  transform:translateX(-50%);
   z-index:11;opacity:0;
   pointer-events:none;
-  animation:swipeHint 3s ease 1.5s forwards;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  animation:swipeHint 3.5s ease 1.8s forwards;
 }
 .swipe-hint svg{ display:block; }
+.swipe-hint-label{
+  font-family:var(--font-body);font-size:9px;font-weight:500;
+  letter-spacing:0.14em;text-transform:uppercase;
+  color:rgba(30,30,30,0.4);white-space:nowrap;
+}
 @keyframes swipeHint{
-  0%  {opacity:0;transform:translateY(4px)}
-  20% {opacity:0.5;transform:translateY(0)}
-  80% {opacity:0.5;transform:translateY(0)}
-  100%{opacity:0;transform:translateY(-4px)}
+  0%  {opacity:0;transform:translateX(-50%) translateY(6px)}
+  20% {opacity:1;transform:translateX(-50%) translateY(0)}
+  75% {opacity:1;transform:translateX(-50%) translateY(0)}
+  100%{opacity:0;transform:translateX(-50%) translateY(-4px)}
 }
 
 /* ─────────────────────────────────────────
@@ -1260,23 +1292,43 @@ footer{
       <div>
         <div class="mpop-name">Cafina</div>
         <div class="mpop-addr">
-          Số 6, Kỳ Đồng, Hồng Bàng, Hải Phòng<br>
+          Số 6, P. Kỳ Đồng, Hồng Bàng, Hải Phòng<br>
           ☎ Zalo: 0364-941-383
         </div>
       </div>
       <button class="mpop-x" onclick="closeMap()">×</button>
     </div>
+    <!-- Corrected embed: lat 20.8584903, lng 106.6808983, place ID from Maps redirect -->
     <iframe class="mpop-map"
-      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.5!2d106.6731!3d20.8449!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x314a7a4e5a1b7e3b%3A0x0!2zU-G7kSA2IEvhu7kgxJDhu5NuZywgSOG7k25nIELDoCwgSOG6o2kgUGjDsm5n!5e0!3m2!1svi!2svn!4v1"
+      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d238.4!2d106.6808983!3d20.8584903!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x314a7af4bfaf2e83%3A0x13383bfa2c6391dd!2zU-G7kSA2IFAuIEvhu7kgxJDhu5NuZywgSOG7k25nIELDoCwgSOG6o2kgUGjDsm5n!5e1!3m2!1svi!2svn!4v1"
       allowfullscreen loading="lazy"></iframe>
     <div class="mpop-btns">
-      <a class="mpop-btn" href="https://www.google.com/maps/search/Số+6+Kỳ+Đồng+Hồng+Bàng+Hải+Phòng" target="_blank">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-        Google Maps
+      <!-- Google Maps — opens in browser -->
+      <a class="mpop-btn gmap"
+         href="https://www.google.com/maps/place/?q=place_id:0x314a7af4bfaf2e83:0x13383bfa2c6391dd"
+         target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
+          <polyline points="15 3 21 3 21 9"/>
+          <line x1="10" y1="14" x2="21" y2="3"/>
+        </svg>
+        <div class="mpop-btn-label">
+          <span class="mpop-btn-label-main">Google Maps</span>
+          <span class="mpop-btn-label-sub">Mở trong trình duyệt</span>
+        </div>
       </a>
-      <a class="mpop-btn prime" href="geo:20.8449,106.6731?q=Cafina+Số+6+Kỳ+Đồng+Hải+Phòng" target="_blank">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
-        Mở Maps
+      <!-- Apple Maps on iOS, Google Maps fallback on other devices -->
+      <a class="mpop-btn prime" id="nativeMapsBtn"
+         href="https://maps.apple.com/?ll=20.8584903,106.6808983&q=Cafina&address=S%E1%BB%91+6+K%E1%BB%B3+%C4%90%E1%BB%93ng,+H%E1%BA%A3i+Ph%C3%B2ng"
+         target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+          <circle cx="12" cy="9" r="2.5"/>
+        </svg>
+        <div class="mpop-btn-label">
+          <span class="mpop-btn-label-main" id="nativeMapsLabel">Mở Maps</span>
+          <span class="mpop-btn-label-sub" id="nativeMapsSubLabel">Chỉ đường ngay</span>
+        </div>
       </a>
     </div>
   </div>
@@ -1354,11 +1406,13 @@ footer{
     </div>
     <div class="slide-dots" id="slideDots"></div>
     <div class="hero-label">Số 6, Kỳ Đồng · Hải Phòng</div>
-    <!-- Swipe hint — fades in after load, disappears after 5s -->
+    <!-- Tap / swipe hint — fades in after load, disappears after a few seconds -->
     <div class="swipe-hint" id="swipeHint">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(30,30,30,0.4)" stroke-width="1.5">
-        <path d="M12 19V5M5 12l7-7 7 7"/>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(30,30,30,0.45)" stroke-width="1.5">
+        <path d="M9 11V6a2 2 0 014 0v4"/>
+        <path d="M13 10h0a2 2 0 012 2v1h0a2 2 0 012 2v3a4 4 0 01-4 4H9a4 4 0 01-4-4v-5a2 2 0 012-2h0"/>
       </svg>
+      <span class="swipe-hint-label">Nhấn để xem tiếp</span>
     </div>
   </div>
 </section>
@@ -1476,13 +1530,13 @@ footer{
     </div>
     <div>
       <div class="map-box">
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.5!2d106.6731!3d20.8449!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x314a7a4e5a1b7e3b%3A0x0!2zU-G7kSA2IEvhu7kgxJDhu5NuZywgSOG7k25nIELDoCwgSOG6o2kgUGjDsm5n!5e0!3m2!1svi!2svn!4v1" allowfullscreen loading="lazy"></iframe>
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d238.4!2d106.6808983!3d20.8584903!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x314a7af4bfaf2e83%3A0x13383bfa2c6391dd!2zU-G7kSA2IFAuIEvhu7kgxJDhu5NuZywgSOG7k25nIELDoCwgSOG6o2kgUGjDsm5n!5e1!3m2!1svi!2svn!4v1" allowfullscreen loading="lazy"></iframe>
         <div class="map-box-tag">
           <span class="map-box-tag-n">CAFINA</span>
           <span class="map-box-tag-a">Số 6, Kỳ Đồng · Hồng Bàng</span>
         </div>
       </div>
-      <a href="https://www.google.com/maps/search/Số+6+Kỳ+Đồng+Hồng+Bàng+Hải+Phòng" target="_blank" class="map-open-link">
+      <a href="https://www.google.com/maps/place/?q=place_id:0x314a7af4bfaf2e83:0x13383bfa2c6391dd" target="_blank" class="map-open-link">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
         Mở trong Google Maps
       </a>
@@ -1747,12 +1801,18 @@ function resetSlideTimer() {
   if (slideTotal >= 2) slideTimer = setInterval(function() { nextSlide(); }, 4000);
 }
 
-/* ── Swipe / drag ── */
+/* ── Tap / Swipe / drag ──
+ * Tap  (< TAP_THRESH movement) → next slide
+ * Swipe up   (≥ SWIPE_THRESH)  → next slide
+ * Swipe down (≥ SWIPE_THRESH)  → prev slide
+ */
+var TAP_THRESH = 8; /* px — movement below this = tap */
+
 function initSwipe() {
   var ss = document.getElementById('heroSlideshow');
   if (!ss) return;
 
-  /* Touch events */
+  /* ── TOUCH ── */
   ss.addEventListener('touchstart', function(e) {
     dragStartY = e.touches[0].clientY;
     dragDeltaY = 0;
@@ -1767,14 +1827,18 @@ function initSwipe() {
   ss.addEventListener('touchend', function() {
     if (!isDragging) return;
     isDragging = false;
-    if (Math.abs(dragDeltaY) > SWIPE_THRESH) {
-      if (dragDeltaY < 0) nextSlide(); /* swipe up → next */
-      else                prevSlide(); /* swipe down → prev */
+    var dist = Math.abs(dragDeltaY);
+    if (dist < TAP_THRESH) {
+      /* Tap → advance to next */
+      nextSlide(); resetSlideTimer();
+    } else if (dist >= SWIPE_THRESH) {
+      if (dragDeltaY < 0) nextSlide();
+      else                prevSlide();
       resetSlideTimer();
     }
   });
 
-  /* Mouse drag (desktop) */
+  /* ── MOUSE (desktop) ── */
   ss.addEventListener('mousedown', function(e) {
     dragStartY = e.clientY;
     dragDeltaY = 0;
@@ -1790,7 +1854,11 @@ function initSwipe() {
   ss.addEventListener('mouseup', function() {
     if (!isDragging) return;
     isDragging = false;
-    if (Math.abs(dragDeltaY) > SWIPE_THRESH) {
+    var dist = Math.abs(dragDeltaY);
+    if (dist < TAP_THRESH) {
+      /* Click → advance to next */
+      nextSlide(); resetSlideTimer();
+    } else if (dist >= SWIPE_THRESH) {
       if (dragDeltaY < 0) nextSlide();
       else                prevSlide();
       resetSlideTimer();
@@ -1940,6 +2008,37 @@ function openMap()   { document.getElementById('mpopBg').classList.add('on'); do
 function closeMap()  { document.getElementById('mpopBg').classList.remove('on'); document.body.style.overflow = ''; }
 function bgClick(e)  { if (e.target === document.getElementById('mpopBg')) closeMap(); }
 document.addEventListener('keydown', function(e){ if (e.key === 'Escape') { closeLb(); closeMap(); } });
+
+/* ══════════════════════════════════════
+   NATIVE MAPS BUTTON — iOS vs others
+   iOS → maps.apple.com (opens Apple Maps natively)
+   Android/desktop → Google Maps deep link
+══════════════════════════════════════ */
+(function() {
+  var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+  var isAndroid = /Android/i.test(navigator.userAgent);
+  var btn  = document.getElementById('nativeMapsBtn');
+  var lbl  = document.getElementById('nativeMapsLabel');
+  var sub  = document.getElementById('nativeMapsSubLabel');
+  if (!btn) return;
+
+  if (isIOS) {
+    /* Apple Maps — ll param + address label */
+    btn.href = 'maps://maps.apple.com/?ll=20.8584903,106.6808983&q=Cafina&address=S%E1%BB%91+6+K%E1%BB%B3+%C4%90%E1%BB%93ng,+H%E1%BA%A3i+Ph%C3%B2ng';
+    if (lbl) lbl.textContent = 'Apple Maps';
+    if (sub) sub.textContent = 'Mở ứng dụng Bản đồ';
+  } else if (isAndroid) {
+    /* Android — intent URI that opens Google Maps app directly */
+    btn.href = 'intent://maps.google.com/maps?q=20.8584903,106.6808983(Cafina)&z=18#Intent;scheme=https;package=com.google.android.apps.maps;end';
+    if (lbl) lbl.textContent = 'Google Maps';
+    if (sub) sub.textContent = 'Mở ứng dụng Maps';
+  } else {
+    /* Desktop — standard Google Maps URL */
+    btn.href = 'https://www.google.com/maps/place/?q=place_id:0x314a7af4bfaf2e83:0x13383bfa2c6391dd';
+    if (lbl) lbl.textContent = 'Mở Maps';
+    if (sub) sub.textContent = 'Chỉ đường ngay';
+  }
+})();
 
 /* ══════════════════════════════════════
    MUSIC PLAYER
