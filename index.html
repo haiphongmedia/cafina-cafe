@@ -49,12 +49,17 @@ body{
   display:flex;flex-direction:column;
   align-items:center;justify-content:center;
   gap:28px;
-  transition:opacity 0.6s ease, visibility 0.6s ease;
+  contain: layout style;
+  /* NO transition here — any transition on this element
+     triggers subtree style recalcs that reset sibling
+     CSS animations. Fade is handled on .hidden directly. */
 }
 #loadScreen.hidden{
-  opacity:0;
-  visibility:hidden;
+  animation: lsFadeOut 0.6s ease forwards;
   pointer-events:none;
+}
+@keyframes lsFadeOut{
+  to { opacity:0; visibility:hidden; }
 }
 .load-brand{
   font-family: var(--font-display);
@@ -64,19 +69,18 @@ body{
 }
 .loader{
   width:11em;height:11em;
+  /* Own compositor layer — style mutations on siblings
+     (the progress bar) cannot interrupt this animation */
+  will-change: transform;
+  contain: strict;
 }
-/* The dual-keyframe trick: each path draws itself on and
-   then erases itself in a continuous flowing wave.
-   dashArray morphs the visible arc length; dashOffset
-   scrolls it around the perimeter — together they create
-   a smooth self-writing loop with no JS involvement. */
 .loader path{
   stroke:rgba(255,255,255,0.85);
   stroke-width:0.6px;
   fill:none;
   animation:
-    dashArray   4s ease-in-out infinite,
-    dashOffset  4s linear     infinite;
+    dashArray  4s ease-in-out infinite,
+    dashOffset 4s linear     infinite;
 }
 @keyframes dashArray{
   0%   { stroke-dasharray: 0   1   359 0; }
@@ -1630,20 +1634,37 @@ var dataReady = false;
 
 /* ══════════════════════════════════════
    LOADING SCREEN
+   Progress bar and status text are updated
+   via requestAnimationFrame so style writes
+   are always batched into the next paint cycle
+   and can never interrupt the SVG animation.
 ══════════════════════════════════════ */
 var loadProgress = 0;
+var _rafPending = false;
+var _pendingPct = 0;
+var _pendingTxt = '';
+
 function setLoadProgress(pct, statusText) {
   loadProgress = pct;
-  var bar = document.getElementById('loadBar');
-  var st  = document.getElementById('loadStatus');
-  if (bar) bar.style.width = pct + '%';
-  if (st && statusText) st.textContent = statusText;
+  _pendingPct  = pct;
+  _pendingTxt  = statusText || _pendingTxt;
+  if (_rafPending) return;          /* coalesce rapid calls */
+  _rafPending = true;
+  requestAnimationFrame(function() {
+    _rafPending = false;
+    var bar = document.getElementById('loadBar');
+    var st  = document.getElementById('loadStatus');
+    if (bar) bar.style.width = _pendingPct + '%';
+    if (st && _pendingTxt) st.textContent = _pendingTxt;
+  });
 }
 function hideLoadScreen() {
   var ls = document.getElementById('loadScreen');
   if (!ls) return;
   ls.classList.add('hidden');
-  setTimeout(function(){ ls.remove(); }, 700);
+  /* Remove from DOM after the lsFadeOut animation (0.6s) finishes
+     so it can never block clicks or intercept events */
+  setTimeout(function(){ ls.remove(); }, 650);
 }
 
 /* ══════════════════════════════════════
