@@ -843,9 +843,10 @@ section{padding:100px 80px}
 .mc-img{
   aspect-ratio:4/3;overflow:hidden;
   background:var(--off2);position:relative;
+  display:flex;align-items:center;justify-content:center;
 }
 .mc-img img{
-  width:100%;height:100%;object-fit:cover;
+  width:100%;height:100%;object-fit:contain;
   transition:transform 0.5s;
 }
 .mc:hover .mc-img img{transform:scale(1.06)}
@@ -886,6 +887,33 @@ section{padding:100px 80px}
   text-transform:uppercase;padding:3px 8px;
   background:#fef3e2;color:#9a6200;
   font-family: var(--font-body);
+}
+
+/* ─────────────────────────────────────────
+   FULL-WIDTH BANNERS (Sheet ẢNH cols C/D/E)
+   Edge-to-edge, width always = viewport width.
+   aspect-ratio locks each banner to the ratio
+   of the source photo so nothing crops/zooms
+   as long as the uploaded image matches it.
+───────────────────────────────────────── */
+.full-banner{
+  width:100%;
+  overflow:hidden;
+  background:var(--off2);
+  line-height:0;
+}
+.full-banner img{
+  width:100%;height:100%;
+  object-fit:cover;
+  display:block;
+}
+.banner-top{ aspect-ratio:3/4; }   /* C2 */
+.banner-mid{ aspect-ratio:1/1; }   /* D2 — 5x5 */
+.banner-bot{ aspect-ratio:4/6; }   /* E3 */
+@media(max-width:768px){
+  .banner-top{ aspect-ratio:3/4; }
+  .banner-mid{ aspect-ratio:1/1; }
+  .banner-bot{ aspect-ratio:4/6; }
 }
 
 /* ─────────────────────────────────────────
@@ -1355,6 +1383,11 @@ footer{
   </div>
 </div>
 
+<!-- BANNER TOP (Sheet ẢNH C2 — 3:4, full width above hero) -->
+<div class="full-banner banner-top" id="bannerTop">
+  <div class="skel-light" style="width:100%;height:100%"></div>
+</div>
+
 <!-- HERO -->
 <section id="hero">
   <div class="hero-l concrete-wrap">
@@ -1378,8 +1411,8 @@ footer{
       </div>
     </div>
     <div class="hero-h1">CAFINA</div>
-    <span class="hero-h1-line2">nơi thời gian<br>chậm lại</span>
-    <p class="hero-body">Không gian thơ mộng, nguyên liệu chọn lọc — mỗi ly là một trải nghiệm được chăm chút từ đầu đến cuối.</p>
+    <span class="hero-h1-line2"> May your days always shine as gian<br> brightly as the stars. </span>
+    <p class="hero-body"> Hân hạnh được phục vụ.</p>
     <div class="hero-actions">
       <a href="#mn" class="btn-primary">
         Xem menu
@@ -1504,6 +1537,11 @@ footer{
   </div>
 </section>
 
+<!-- BANNER MID (Sheet ẢNH D2 — 5x5 / 1:1, right after the menu) -->
+<div class="full-banner banner-mid" id="bannerMid">
+  <div class="skel-light" style="width:100%;height:100%"></div>
+</div>
+
 <!-- KHÔNG GIAN -->
 <section id="kg">
   <div class="sh rv">
@@ -1564,6 +1602,11 @@ footer{
     </div>
   </div>
 </section>
+
+<!-- BANNER BOT (Sheet ẢNH E3 — 4x6, right below contact/address) -->
+<div class="full-banner banner-bot" id="bannerBot">
+  <div class="skel-light" style="width:100%;height:100%"></div>
+</div>
 
 <!-- FOOTER -->
 <footer>
@@ -1711,6 +1754,9 @@ function load() {
       renderBs(ALL);
       renderMn(ALL);
       renderKg(imgs);
+      renderBanner('bannerTop', d.bannerTop);
+      renderBanner('bannerMid', d.bannerMid);
+      renderBanner('bannerBot', d.bannerBot);
 
       dataReady = true;
       setLoadProgress(100, 'Chào mừng!');
@@ -1742,6 +1788,17 @@ function finishLoad() {
     hideLoadScreen();
     setTimeout(rev, 300);
   }, 350);
+}
+
+/* ══════════════════════════════════════
+   FULL-WIDTH BANNERS (sheet ẢNH cols C/D/E)
+══════════════════════════════════════ */
+function renderBanner(id, url) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  if (!url) { el.style.display = 'none'; return; }
+  el.innerHTML = '<img src="' + url + '" alt="" loading="lazy" '
+    + 'onerror="this.parentNode.style.display=\'none\'">';
 }
 
 /* ══════════════════════════════════════
