@@ -1354,7 +1354,7 @@ footer{
     <div class="mpop-btns">
       <!-- Google Maps — opens in browser -->
       <a class="mpop-btn gmap"
-         href="https://www.google.com/maps/search/6+P.+K%E1%BB%B3+%C4%90%E1%BB%93ng,+H%E1%BB%93ng+B%C3%A0ng,+H%E1%BA%A3i+Ph%C3%B2ng,+Vi%E1%BB%87t+Nam/@20.8584903,106.6808983,18z"
+         href="https://www.google.com/maps/place/CAFINA-Cafe+6+P.K%E1%BB%B3+%C4%90%E1%BB%93ng/@20.8584903,106.6808983,21z/data=!3m1!4b1!4m6!3m5!1s0x314a7b003544dc0d:0x2c16ab89762ed282!8m2!3d20.8584903!4d106.6808983!16s%2Fg%2F11z8k3j9nv"
          target="_blank" rel="noopener">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
           <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
@@ -1595,7 +1595,7 @@ footer{
           <span class="map-box-tag-a">Số 6, Kỳ Đồng · Hồng Bàng</span>
         </div>
       </div>
-      <a href="https://www.google.com/maps/search/6+P.+K%E1%BB%B3+%C4%90%E1%BB%93ng,+H%E1%BB%93ng+B%C3%A0ng,+H%E1%BA%A3i+Ph%C3%B2ng,+Vi%E1%BB%87t+Nam/@20.8584903,106.6808983,18z" target="_blank" class="map-open-link">
+      <a href="https://www.google.com/maps/place/CAFINA-Cafe+6+P.K%E1%BB%B3+%C4%90%E1%BB%93ng/@20.8584903,106.6808983,21z/data=!3m1!4b1!4m6!3m5!1s0x314a7b003544dc0d:0x2c16ab89762ed282!8m2!3d20.8584903!4d106.6808983!16s%2Fg%2F11z8k3j9nv" target="_blank" class="map-open-link">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
         Mở trong Google Maps
       </a>
@@ -2124,17 +2124,17 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') { clos
 
   if (isIOS) {
     /* Apple Maps — ll param + address label */
-    btn.href = 'maps://maps.apple.com/?ll=20.8584903,106.6808983&q=Cafina&address=S%E1%BB%91+6+K%E1%BB%B3+%C4%90%E1%BB%93ng,+H%E1%BA%A3i+Ph%C3%B2ng';
+    btn.href = 'maps://maps.apple.com/?ll=20.8584903,106.6808983&q=CAFINA-Cafe&address=6+P.+K%E1%BB%B3+%C4%90%E1%BB%93ng,+H%E1%BB%93ng+B%C3%A0ng,+H%E1%BA%A3i+Ph%C3%B2ng,+Vi%E1%BB%87t+Nam';
     if (lbl) lbl.textContent = 'Apple Maps';
     if (sub) sub.textContent = 'Mở ứng dụng Bản đồ';
   } else if (isAndroid) {
     /* Android — intent URI that opens Google Maps app directly */
-    btn.href = 'intent://maps.google.com/maps?q=20.8584903,106.6808983(Cafina)&z=18#Intent;scheme=https;package=com.google.android.apps.maps;end';
+    btn.href = 'intent://maps.google.com/maps?q=place_id:0x314a7b003544dc0d:0x2c16ab89762ed282#Intent;scheme=https;package=com.google.android.apps.maps;end';
     if (lbl) lbl.textContent = 'Google Maps';
     if (sub) sub.textContent = 'Mở ứng dụng Maps';
   } else {
     /* Desktop — standard Google Maps URL */
-    btn.href = 'https://www.google.com/maps/search/6+P.+K%E1%BB%B3+%C4%90%E1%BB%93ng,+H%E1%BB%93ng+B%C3%A0ng,+H%E1%BA%A3i+Ph%C3%B2ng,+Vi%E1%BB%87t+Nam/@20.8584903,106.6808983,18z';
+    btn.href = 'https://www.google.com/maps/place/CAFINA-Cafe+6+P.K%E1%BB%B3+%C4%90%E1%BB%93ng/@20.8584988,106.6808282,21z/data=!4m15!1m8!3m7!1s0x314a7af4bfaf2e83:0x13383bfa2c6391dd!2zNiBQLiBL4buzIMSQ4buTbmcsIEjhu5NuZyBCw6BuZywgSOG6o2kgUGjDsm5nLCBWaeG7h3QgTmFt!3b1!8m2!3d20.8584903!4d106.6808983!16s%2Fg%2F11f105ys3t!3m5!1s0x314a7b003544dc0d:0x2c16ab89762ed282!8m2!3d20.8584903!4d106.6808983!16s%2Fg%2F11z8k3j9nv';
     if (lbl) lbl.textContent = 'Mở Maps';
     if (sub) sub.textContent = 'Chỉ đường ngay';
   }
